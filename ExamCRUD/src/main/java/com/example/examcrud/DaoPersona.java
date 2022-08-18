@@ -19,16 +19,16 @@ public class DaoPersona {
         BeanPersona persona;
         try{
             conn = new MySQLConnection().getConnection();
-            String query = "SELECT * FROM personas;";
+            String query = "SELECT * FROM registro;";
             pstm = conn.prepareStatement(query);
             rs = pstm.executeQuery();
             while (rs.next()) {
                 persona = new BeanPersona();
-                persona.setId(rs.getInt("id"));
+                persona.setId(rs.getLong("id"));
                 persona.setNombre(rs.getString("nombre"));
-                persona.setSurname(rs.getString("subname"));
+                persona.setSurname(rs.getString("surname"));
                 persona.setCurp(rs.getString("curp"));
-                persona.setBirthday(rs.getString("cumple"));
+                persona.setBirthday(rs.getString("birthday"));
                 personas.add(persona);
             }
         }catch (SQLException e) {
@@ -43,9 +43,9 @@ public class DaoPersona {
     public boolean save(BeanPersona persona) {
         try {
             conn = new MySQLConnection().getConnection();
-            String query = "INSERT INTO personas" +
+            String query = "INSERT INTO registro" +
                     "(nombre, surname, curp, birthday)" +
-                    " VALUES (?,?,?,?,1)";
+                    " VALUES (?,?,?,?)";
             pstm = conn.prepareStatement(query);
             pstm.setString(1, persona.getNombre());
             pstm.setString(2, persona.getSurname());
@@ -64,7 +64,7 @@ public class DaoPersona {
     public BeanPersona findOne(Long id) {
         try {
             conn = new MySQLConnection().getConnection();
-            String query = "SELECT * FROM personas WHERE id = ?";
+            String query = "SELECT * FROM registro WHERE id = ?";
             pstm = conn.prepareStatement(query);
             pstm.setLong(1, id);
             rs = pstm.executeQuery();
@@ -77,6 +77,7 @@ public class DaoPersona {
                 persona.setBirthday(rs.getString("birthday"));
                 return persona;
             }
+
         } catch (SQLException e) {
             Logger.getLogger(DaoPersona.class.getName())
                     .log(Level.SEVERE, "Error findOne", e);
@@ -89,7 +90,7 @@ public class DaoPersona {
     public boolean update(BeanPersona persona) {
         try {
             conn = new MySQLConnection().getConnection();
-            String query = "UPDATE personas SET nombre = ?, surname = ?, curp = ?," +
+            String query = "UPDATE registro SET nombre = ?, surname = ?, curp = ?," +
                     "birthday = ? WHERE id = ?";
             pstm = conn.prepareStatement(query);
             pstm.setString(1, persona.getNombre());
@@ -110,7 +111,7 @@ public class DaoPersona {
     public boolean delete(Long id) {
         try {
             conn = new MySQLConnection().getConnection();
-            String query = "DELETE FROM personas WHERE id = ?";
+            String query = "DELETE FROM registro WHERE id = ?";
             pstm = conn.prepareStatement(query);
             pstm.setLong(1, id);
             return pstm.executeUpdate() == 1;
