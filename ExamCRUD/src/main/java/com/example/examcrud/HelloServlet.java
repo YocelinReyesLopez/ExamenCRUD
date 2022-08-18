@@ -28,16 +28,6 @@ public class HelloServlet extends HttpServlet {
 
     //Yocelin Reyes L.
 
-    String uploadPath = "C:" + File.separator + "temp" + File.separator;
-    String fileName;
-
-    @Override
-    public void init() throws ServletException {
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists())
-            uploadDir.mkdir();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -48,6 +38,7 @@ public class HelloServlet extends HttpServlet {
             case "/get-personas":
                 List<BeanPersona> personas = servicePersona.getAll();
                 System.out.println(personas.size());
+                System.out.println(personas);
                 request.setAttribute("personas", personas);
                 urlRedirect = "/consulta.jsp";
                 break;
@@ -82,43 +73,56 @@ public class HelloServlet extends HttpServlet {
         action = request.getServletPath();
         switch (action) {
             case "/add-persona":
-                String nombre = request.getParameter("nombre");
-                String surname = request.getParameter("surname");
-                String curp = request.getParameter("curp");
-                String birthday = request.getParameter("birthday");
-                BeanPersona persona = new BeanPersona();
-                persona.setNombre(nombre);
-                persona.setSurname(surname);
-                persona.setCurp(curp);
-                persona.setBirthday(birthday);
-                ResultAction result = servicePersona.save(persona);
-                urlRedirect = "/get-personas";
+                try{
+                    String nombre = request.getParameter("nombre");
+                    String surname = request.getParameter("surname");
+                    String curp = request.getParameter("curp");
+                    String birthday = request.getParameter("birthday");
+                    BeanPersona persona = new BeanPersona();
+                    persona.setNombre(nombre);
+                    persona.setSurname(surname);
+                    persona.setCurp(curp);
+                    persona.setBirthday(birthday);
+                    ResultAction result = servicePersona.save(persona);
+                    urlRedirect = "/get-personas?result=" + result.isResult() + "&message=" + URLEncoder.encode(result.getMessage(), StandardCharsets.UTF_8.name()) + "&status=" + result.getStatus();
+                }catch (Exception e){
+                    System.out.println(e);
+                    urlRedirect = "/get-personas?result=false&message="+URLEncoder.encode("Error al registrar persona", StandardCharsets.UTF_8.name())+"&status=400";
+
+                }
                 break;
             case "/save-persona":
-                String nombre2 = request.getParameter("nombre");
-                String surname2 = request.getParameter("surname");
-                String curp2 = request.getParameter("curp");
-                String birthday2 = request.getParameter("birthday");
-                String id = request.getParameter("id");
-                BeanPersona persona2 = new BeanPersona();
-                persona2.setId(Long.parseLong(id));
-                persona2.setNombre(nombre2);
-                persona2.setSurname(surname2);
-                persona2.setCurp(curp2);
-                persona2.setBirthday(birthday2);
-                ResultAction result2 = servicePersona.update(persona2);
-                urlRedirect = "/get-personas?result=" +
-                        result2.isResult() + "&message=" +
-                        URLEncoder.encode(result2.getMessage(), StandardCharsets.UTF_8.name())
-                        + "&status=" + result2.getStatus();
+                try{
+                    String nombre = request.getParameter("nombre");
+                    String surname = request.getParameter("surname");
+                    String curp = request.getParameter("curp");
+                    String birthday = request.getParameter("birthday");
+                    String id = request.getParameter("id");
+                    BeanPersona persona = new BeanPersona();
+                    persona.setId(Long.parseLong(id));
+                    persona.setNombre(nombre);
+                    persona.setSurname(surname);
+                    persona.setCurp(curp);
+                    persona.setBirthday(birthday);
+                    ResultAction result = servicePersona.update(persona);
+                    urlRedirect = "/get-personas?result=" + result.isResult() + "&message=" + URLEncoder.encode(result.getMessage(), StandardCharsets.UTF_8.name()) + "&status=" + result.getStatus();
+
+                }catch (Exception e){
+                    urlRedirect = "/get-personas?result=false&message="+URLEncoder.encode("Error al guardar persona", StandardCharsets.UTF_8.name())+"&status=400";
+                }
                 break;
+
             case "/delete-persona":
-                String idPersona = request.getParameter("id");
-                ResultAction deleteResult = servicePersona.delete(idPersona);
-                urlRedirect = "/get-personas?result=" +
-                        deleteResult.isResult() + "&message=" +
-                        URLEncoder.encode(deleteResult.getMessage(), StandardCharsets.UTF_8.name())
-                        + "&status=" + deleteResult.getStatus();
+                try{
+                    String idPersona = request.getParameter("id");
+                    ResultAction deleteResult = servicePersona.delete(idPersona);
+                    urlRedirect = "/get-personas?result=" +
+                            deleteResult.isResult() + "&message=" +
+                            URLEncoder.encode(deleteResult.getMessage(), StandardCharsets.UTF_8.name())
+                            + "&status=" + deleteResult.getStatus();
+                }catch (Exception e){
+                    urlRedirect = "/get-personas?result=false&message="+URLEncoder.encode("Error al eliminar persona", StandardCharsets.UTF_8.name())+"&status=400";
+                }
                 break;
             default:
                 urlRedirect = "/get-personas";
